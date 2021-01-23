@@ -1,0 +1,11 @@
+{
+    "name": "Text autocompletion application by AR32",
+    "description": "Autocompletes sentences using ngram model prediction function based on most widely used combination of words.",
+    "keywords": [
+      "heroku",
+      "R deployment",
+      "Dash R",
+      "Autocompletion",
+      "Text analytics"
+    ]
+}

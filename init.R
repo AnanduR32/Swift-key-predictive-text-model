@@ -11,4 +11,14 @@ options(repos=r)
 # packages go here
 install.packages('remotes')
 install.packages('stringr')
-remotes::install_github('plotly/dashR', upgrade=TRUE)
+
+
+# fiery and friends
+install.packages("https://cloud.r-project.org/src/contrib/routr_0.4.0.tar.gz", type="source", repos=NULL)
+install.packages("https://cloud.r-project.org/src/contrib/fiery_1.1.2.tar.gz", type="source", repos=NULL)
+
+# dash components
+remotes::install_github("plotly/dash-table", ref="042ad65")
+remotes::install_github("plotly/dash-html-components", ref="17da1f4")
+remotes::install_github("plotly/dash-core-components", ref="cc1e654")
+remotes::install_github("plotly/dashR", ref="dev", dependencies=FALSE)
