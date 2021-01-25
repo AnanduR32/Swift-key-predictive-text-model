@@ -9,6 +9,10 @@ from datetime import date, datetime as dt
 import time
 import re
 
+import nltk 
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+
 from urllib.request import urlopen
 import json
 
@@ -35,6 +39,11 @@ title_main = '#ec4646'
 sub_title = '#663f3f'
 bg_color = '#bbf1fa'
 fg_color = '#51c2d5'
+
+## NLTK 
+nltk.download('stopwords')
+nltk.download('punkt')
+stop_words = set(stopwords.words('english'))  
 
 app.layout = html.Div(
     className = 'row',
