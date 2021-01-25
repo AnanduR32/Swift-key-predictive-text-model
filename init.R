@@ -8,15 +8,5 @@ options(repos=r)
 
 # ======================================================================
 
-# packages go here
 install.packages('remotes')
-install.packages('stringr')
-
-
-# fiery and friends
-install.packages(c("fiery", "routr", "reqres", "htmltools", "base64enc", "plotly", "mime", "crayon", "devtools"))
-
-# dash components
-# installs dashHtmlComponents, dashCoreComponents, and dashTable
-# and will update the component libraries when a new package is released
-devtools::install_github("plotly/dashR", ref="dev", upgrade = TRUE)
+remotes::install_github("plotly/dashR", upgrade = TRUE)
