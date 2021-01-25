@@ -23,7 +23,7 @@ app$layout(
               y=list(2, 4, 5),
               type='bar',
               name='Montr\U{00E9}al'
-            # )
+            )
           ),
           layout = list(title='Dash Data Visualization')
         )
