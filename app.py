@@ -87,7 +87,16 @@ app.layout = html.Div(
                                     ],
                                     style = {'color':sub_title, 'fontWeight': 'bold', 'text-align':'center'},
                                 ),
-                                html.P('''Predicting the next word in the sentence using NGram models created using R'''),
+                                html.Div(
+                                    className = 'column',
+                                    style = {'padding-bottom':'1.2em'},
+                                    children = [
+                                        html.Div(
+                                            className = 'four columns',
+                                        ),   
+                                        html.P('''Predicting the next word in the sentence using NGram models created using R'''),
+                                    ]
+                                ),
                                 html.Div(
                                     style = {'height':'1em'},
                                 )
@@ -100,7 +109,8 @@ app.layout = html.Div(
                                 },
                                 type="text", 
                                 placeholder="Enter the sentence",
-                                debounce=True
+                                autoComplete ='off',
+                                # debounce=True
                             ),
                             html.Div(
                                 className = 'column',
@@ -117,7 +127,7 @@ app.layout = html.Div(
                                         ]
                                     ),
                                     html.Div(
-                                        className = 'four columns',
+                                        # className = 'four columns',
                                         id = 'display'
                                     )   
                                 ]
