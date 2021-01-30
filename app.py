@@ -45,9 +45,50 @@ nltk.download('stopwords')
 nltk.download('punkt')
 stop_words = set(stopwords.words('english'))  
 
+## Data
+df_bigram = pd.read_csv("data/top_bigrams.csv", encoding='utf-8')
+df_trigram = pd.read_csv("data/top_trigrams.csv", encoding='utf-8')
+df_tetragram = pd.read_csv("data/top_tetragrams.csv", encoding='utf-8')
+
 ## Autocompletion function
-def predictWord(input):
-    return(input)
+def predictWord(string):
+    preds_ = ""
+    pred = ""
+    string_tokenized = word_tokenize(string)  
+    string_filtered = [x for x in string_tokenized if not x in stop_words]
+    string = " ".join(string_filtered)
+    best_pred = ""
+    n_words = len(string_filtered)
+    if(n_words == 3):
+        matching_tetragrams = df_tetragram[df_tetragram['token'].str.contains(string, flags = re.IGNORECASE)]
+        matching_tetragrams['prediction'] = matching_tetragrams['token'].str.extract(string+"[a-zA-Z]*\s([a-zA-Z]+)\s?", flags=re.IGNORECASE)
+        matching_tetragrams.dropna(how = 'any', axis = 0, inplace = True)
+        matching_tetragrams.sort_values(by = ['freq'],axis = 0, inplace = True, ascending=False)
+        best_pred = pd.DataFrame(matching_tetragrams.iloc[0,1:3]).transpose()
+    if(n_words >= 2):
+        matching_trigrams = df_trigram[df_trigram['token'].str.contains(string, flags = re.IGNORECASE)]
+        matching_trigrams['prediction'] = matching_trigrams['token'].str.extract(string+"[a-zA-Z]*\s([a-zA-Z]+)\s?", flags=re.IGNORECASE)
+        matching_trigrams.dropna(how = 'any', axis = 0, inplace = True)
+        matching_trigrams.sort_values(by = ['freq'],axis = 0, inplace = True, ascending=False)
+        pred = pd.DataFrame(matching_trigrams.iloc[0,1:3]).transpose()
+        if(n_words == 2):
+            best_pred = pred
+        else:
+            if(pred.iloc[0,1]>best_pred.iloc[0,1]):
+                best_pred = pred
+    if(n_words >= 1):
+        matching_bigrams = df_bigram[df_bigram['token'].str.contains(string, flags = re.IGNORECASE)]
+        matching_bigrams['prediction'] = matching_bigrams['token'].str.extract(string+"[a-zA-Z]*\s([a-zA-Z]+)\s?", flags=re.IGNORECASE)
+        matching_bigrams.dropna(how = 'any', axis = 0, inplace = True)
+        matching_bigrams.sort_values(by = ['freq'],axis = 0, inplace = True, ascending=False)
+        pred = pd.DataFrame(matching_bigrams.iloc[0,1:3]).transpose()
+        if(n_words == 1):
+            best_pred = pred
+        else:
+            if(pred.iloc[0,1]>best_pred.iloc[0,1]):
+                best_pred = pred
+    pred_word = best_pred.iloc[0,1]
+    return(pred_word)
 
 app.layout = html.Div(
     className = 'columns',
@@ -77,7 +118,7 @@ app.layout = html.Div(
                     style = {
                         'padding':'2.4em',
                         'borderRadius':'25px', 
-                        'background-image': 'linear-gradient(to right top, #b0abc4, #a8aec8, #a0b2c9, #9ab5c9, #95b8c6)'},
+                        'backgroundImage': 'linear-gradient(to right top, #b0abc4, #a8aec8, #a0b2c9, #9ab5c9, #95b8c6)'},
                     children = [
                         html.Div(children = [
                             html.Div(children = [
@@ -85,11 +126,11 @@ app.layout = html.Div(
                                     children = [
                                         'Text auto-completion app',
                                     ],
-                                    style = {'color':sub_title, 'fontWeight': 'bold', 'text-align':'center'},
+                                    style = {'color':sub_title, 'fontWeight': 'bold', 'textAlign':'center'},
                                 ),
                                 html.Div(
                                     className = 'column',
-                                    style = {'padding-bottom':'1.2em'},
+                                    style = {'paddingBottom':'1.2em'},
                                     children = [
                                         html.Div(
                                             className = 'four columns',
@@ -110,11 +151,11 @@ app.layout = html.Div(
                                 type="text", 
                                 placeholder="Enter the sentence",
                                 autoComplete ='off',
-                                # debounce=True
+                                debounce=True
                             ),
                             html.Div(
                                 className = 'column',
-                                style = {'padding-top':'1.2em'},
+                                style = {'paddingTop':'1.2em'},
                                 children = [
                                     html.Div(
                                         className = 'four columns'
@@ -148,6 +189,10 @@ app.layout = html.Div(
     Input("input", "value"),
 )
 def get_input(input):
+    string_tokenized = word_tokenize(input)  
+    string_filtered = [x for x in string_tokenized if not x in stop_words]
+    string_filtered = string_filtered[-3:]
+    string = " ".join(string_filtered)
     output = predictWord(input)
     if(input!=None):
         return "{} {}".format(input, output)
