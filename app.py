@@ -41,8 +41,7 @@ bg_color = '#bbf1fa'
 fg_color = '#51c2d5'
 
 ## NLTK 
-nltk.download('stopwords')
-nltk.download('punkt')
+
 stop_words = set(stopwords.words('english'))  
 
 ## Data
@@ -136,6 +135,7 @@ app.layout = html.Div(
                                             className = 'four columns',
                                         ),   
                                         html.P('''Predicting the next word in the sentence using NGram models created using R'''),
+                                        html.P('''Return/Enter to predict'''),
                                     ]
                                 ),
                                 html.Div(
