@@ -141,7 +141,6 @@ app.layout = html.Div(
                                             className = 'four columns',
                                         ),   
                                         html.P('''Predicting the next word in the sentence using NGram models created using R'''),
-                                        html.P('''Return/Enter to predict'''),
                                     ]
                                 ),
                                 html.Div(
