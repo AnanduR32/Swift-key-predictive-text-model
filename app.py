@@ -5,20 +5,14 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 
-from datetime import date, datetime as dt
-import time
 import re
 
 import nltk 
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
-from urllib.request import urlopen
-import json
-
 import pandas as pd
 import numpy as np
-import pickle
 
 import plotly.express as px
 
