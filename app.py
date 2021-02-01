@@ -41,7 +41,6 @@ bg_color = '#bbf1fa'
 fg_color = '#51c2d5'
 
 ## NLTK 
-
 stop_words = set(stopwords.words('english'))  
 
 ## Data
@@ -64,7 +63,7 @@ def predictWord(string):
         matching_tetragrams.dropna(how = 'any', axis = 0, inplace = True)
         matching_tetragrams.sort_values(by = ['freq'],axis = 0, inplace = True, ascending=False)
         best_pred = pd.DataFrame(matching_tetragrams.iloc[0,1:3]).transpose()
-    if(n_words >= 2):
+    if(n_words == 2 or best_pred.empty):
         matching_trigrams = df_trigram[df_trigram['token'].str.contains(string, flags = re.IGNORECASE)]
         matching_trigrams['prediction'] = matching_trigrams['token'].str.extract(string+"[a-zA-Z]*\s([a-zA-Z]+)\s?", flags=re.IGNORECASE)
         matching_trigrams.dropna(how = 'any', axis = 0, inplace = True)
@@ -75,7 +74,7 @@ def predictWord(string):
         else:
             if(pred.iloc[0,1]>best_pred.iloc[0,1]):
                 best_pred = pred
-    if(n_words >= 1):
+    if(n_words == 1 or best_pred.empty):
         matching_bigrams = df_bigram[df_bigram['token'].str.contains(string, flags = re.IGNORECASE)]
         matching_bigrams['prediction'] = matching_bigrams['token'].str.extract(string+"[a-zA-Z]*\s([a-zA-Z]+)\s?", flags=re.IGNORECASE)
         matching_bigrams.dropna(how = 'any', axis = 0, inplace = True)
@@ -189,10 +188,7 @@ app.layout = html.Div(
     Input("input", "value"),
 )
 def get_input(input):
-    string_tokenized = word_tokenize(input)  
-    string_filtered = [x for x in string_tokenized if not x in stop_words]
-    string_filtered = string_filtered[-3:]
-    string = " ".join(string_filtered)
+    string = " ".join(word_tokenize(input)[-3:])
     output = predictWord(input)
     if(input!=None):
         return "{} {}".format(input, output)
