@@ -38,49 +38,62 @@ fg_color = '#51c2d5'
 stop_words = set(stopwords.words('english'))  
 
 ## Data
-df_bigram = pd.read_csv("data/top_bigrams.csv", encoding='utf-8')
-df_trigram = pd.read_csv("data/top_trigrams.csv", encoding='utf-8')
-df_tetragram = pd.read_csv("data/top_tetragrams.csv", encoding='utf-8')
+NGrams = pd.read_csv("data/NGrams.csv", encoding='utf-8')
 
 ## Autocompletion function
 def predictWord(string):
     preds_ = ""
     pred = ""
-    string_tokenized = word_tokenize(string)  
-    string_filtered = [x for x in string_tokenized if not x in stop_words]
-    string = " ".join(string_filtered)
-    best_pred = ""
-    n_words = len(string_filtered)
+    string = string.lower()
+    best_pred = pd.DataFrame()
+    n_words = len(word_tokenize(string))
+    if(n_words > 4):
+        string_tokenized = word_tokenize(string)[-4:]
+        string = " ".join(string_tokenized)
+        n_words = 4
+    if(n_words == 4):
+        matching_pentagrams = NGrams.loc[NGrams['which']==5,['token','freq']][NGrams.loc[NGrams['which']==5,['token','freq']]['token'].str.startswith(string, na=False)]
+        matching_pentagrams['prediction'] = matching_pentagrams['token'].str.extract(string+"\s([a-zA-Z]+)\s?", flags=re.IGNORECASE)
+        matching_pentagrams.dropna(how = 'any', axis = 0, inplace = True)
+        matching_pentagrams.sort_values(by = ['freq'],axis = 0, inplace = True, ascending=False)
+        if(matching_pentagrams.empty==False):
+            best_pred = pd.DataFrame(matching_pentagrams.iloc[0,1:3]).transpose()
+        else:
+            string_tokenized = word_tokenize(string)[-3:]
+            string = " ".join(string_tokenized)
+            n_words = 3
     if(n_words == 3):
-        matching_tetragrams = df_tetragram[df_tetragram['token'].str.contains(string, flags = re.IGNORECASE)]
+        matching_tetragrams = NGrams.loc[NGrams['which']==4,['token','freq']][NGrams.loc[NGrams['which']==4,['token','freq']]['token'].str.startswith(string, na=False)]
         matching_tetragrams['prediction'] = matching_tetragrams['token'].str.extract(string+"[a-zA-Z]*\s([a-zA-Z]+)\s?", flags=re.IGNORECASE)
         matching_tetragrams.dropna(how = 'any', axis = 0, inplace = True)
         matching_tetragrams.sort_values(by = ['freq'],axis = 0, inplace = True, ascending=False)
-        best_pred = pd.DataFrame(matching_tetragrams.iloc[0,1:3]).transpose()
-    if(n_words == 2 or best_pred.empty):
-        matching_trigrams = df_trigram[df_trigram['token'].str.contains(string, flags = re.IGNORECASE)]
+        if(matching_tetragrams.empty==False):
+            best_pred = pd.DataFrame(matching_tetragrams.iloc[0,1:3]).transpose()
+        else:
+            string_tokenized = word_tokenize(string)[-2:]
+            string = " ".join(string_tokenized)
+            n_words = 2
+    if(n_words == 2):
+        matching_trigrams = NGrams.loc[NGrams['which']==3,['token','freq']][NGrams.loc[NGrams['which']==3,['token','freq']]['token'].str.startswith(string, na=False)]
         matching_trigrams['prediction'] = matching_trigrams['token'].str.extract(string+"[a-zA-Z]*\s([a-zA-Z]+)\s?", flags=re.IGNORECASE)
         matching_trigrams.dropna(how = 'any', axis = 0, inplace = True)
         matching_trigrams.sort_values(by = ['freq'],axis = 0, inplace = True, ascending=False)
-        pred = pd.DataFrame(matching_trigrams.iloc[0,1:3]).transpose()
-        if(n_words == 2):
-            best_pred = pred
+        if(matching_trigrams.empty==False):
+            best_pred = pd.DataFrame(matching_trigrams.iloc[0,1:3]).transpose()
         else:
-            if(pred.iloc[0,1]>best_pred.iloc[0,1]):
-                best_pred = pred
-    if(n_words == 1 or best_pred.empty):
-        matching_bigrams = df_bigram[df_bigram['token'].str.contains(string, flags = re.IGNORECASE)]
+            string_tokenized = word_tokenize(string)[-1:]
+            string = " ".join(string_tokenized)
+            n_words = 1
+    if(n_words == 1):
+        matching_bigrams = NGrams.loc[NGrams['which']==2,['token','freq']][NGrams.loc[NGrams['which']==2,['token','freq']]['token'].str.startswith(string, na=False)]
         matching_bigrams['prediction'] = matching_bigrams['token'].str.extract(string+"[a-zA-Z]*\s([a-zA-Z]+)\s?", flags=re.IGNORECASE)
         matching_bigrams.dropna(how = 'any', axis = 0, inplace = True)
         matching_bigrams.sort_values(by = ['freq'],axis = 0, inplace = True, ascending=False)
-        pred = pd.DataFrame(matching_bigrams.iloc[0,1:3]).transpose()
-        if(n_words == 1):
-            best_pred = pred
-        else:
-            if(pred.iloc[0,1]>best_pred.iloc[0,1]):
-                best_pred = pred
-    pred_word = best_pred.iloc[0,1]
-    return(pred_word)
+        if(matching_bigrams.empty==False):
+            best_pred = pd.DataFrame(matching_bigrams.iloc[0,1:3]).transpose()
+    if(best_pred.empty==False):
+        return(best_pred.iloc[0,1])
+    return("N/A")
 
 app.layout = html.Div(
     className = 'columns',
@@ -144,7 +157,7 @@ app.layout = html.Div(
                                 type="text", 
                                 placeholder="Enter the sentence",
                                 autoComplete ='off',
-                                debounce=True
+                                # debounce=True
                             ),
                             html.Div(
                                 className = 'column',
@@ -182,10 +195,9 @@ app.layout = html.Div(
     Input("input", "value"),
 )
 def get_input(input):
-    string = " ".join(word_tokenize(input)[-3:])
     output = predictWord(input)
     if(input!=None):
-        return "{} {}".format(input, output)
+        return "{}".format(output)
 
 @app.callback(
     Output("display", "children"),
@@ -200,4 +212,4 @@ def display_predicted_word(input):
 
 ## Main
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(debug=True)
