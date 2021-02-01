@@ -26,7 +26,7 @@ app = dash.Dash(__name__,
 ) 
 
 server = app.server
-app.title = 'House price app'
+app.title = 'Text autocompletion app'
 
 ## Colors
 title_main = '#DA4167'
@@ -180,6 +180,75 @@ app.layout = html.Div(
                             )
 
                         ]),
+                    ]
+                ),
+            ]
+        ),
+        # Footer 
+        html.Div(
+            className = 'column',
+            # style = {'margin':'1em'},
+            children = [
+                html.Div(
+                    style = {'paddingTop':'2.4em','paddingLeft':'2.4em','paddingRight':'2.4em','paddingBottom':'0.4em','borderRadius':'25px'},
+                    children = [
+                        dcc.Markdown(
+                            '''
+## Summary 
+Creating a text completion app using **NGram** modelling, which uses *bigrams*, 
+*trigrams*, *tetragrams*, and *pentagram* created from various data sources:  
+- News  
+- Blogs  
+- Twitter  
+                            '''
+                            )
+                    ]
+                ),
+                html.Div(
+                    style = {'paddingTop':'0.4em','paddingLeft':'2.4em','paddingRight':'2.4em','paddingBottom':'0.4em','borderRadius':'25px'},
+                    children = [
+                        html.P('''The Ngrams were created in RStudio’s R environment and has been published on kaggle as well as Rpubs, and the application was created in python using Dash by plotly.'''),
+                        dcc.Markdown(
+                            '''
+Modelling   
+- [Kaggle](https://www.kaggle.com/aquaregis32/text-mining-rmarkdown)  
+- [Rpubs](https://rpubs.com/aquaregis32/textmining_analysisfor_autocomplete_byAR32)  
+ 
+                            '''
+                            )
+                    ]
+                ),
+                html.Div(
+                    style = {'paddingTop':'0.4em','paddingLeft':'2.4em','paddingRight':'2.4em','paddingBottom':'0.4em','borderRadius':'25px'},
+                    children = [
+                        dcc.Markdown(
+                            '''
+### NGram models 
+The Ngrams were created for each of the data sources using NGramTokenizer and 
+TermDocumentMatrix, which was then converted to matrix - The highest memory 
+allocation required to build the matrices was 8gb during the process.  
+
+Once created each of the bigrams, trigrams, tetragrams and pentagrams were combined into one
+dataset by indicating type of NGram they represented using the *which* field.  
+
+The dataset contains the *token*, frequency of occurance - *freq*, and the *which*  
+
+### Application 
+The application has been built completely using python, the R function to 
+predict the word was rewritten in python instead of using RScript.   
+
+The application uses Dash by plotly to create the web app which renders html
+content to any supporting browser.   
+
+The UI is fairly simple, with only some text describing the app and an input box
+It useses bootstrap-grid.css available openly, and uses NLTK, pandas, re (for
+regular expression) libraries for running the code and predicting the output.
+
+User can input the sentence and once entered upon pressing return, the predicted
+output/predicted next word for the sentence input will be displayed right below
+text input box.   
+                            '''
+                            )
                     ]
                 ),
             ]
